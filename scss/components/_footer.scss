@@ -1,0 +1,41 @@
+.logoFooter {
+	width: 20%;
+	img {
+		margin-top: 9px;
+		width: 50%;
+		height: auto;
+	}
+}
+address {
+	text-align: center;
+}
+.menuFooterContainer {
+	width: 80%;
+}
+.footerContent {
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	margin-bottom: 30px;
+	align-items: center;
+	div {
+		display: inline-block;
+		ul {
+			display: inline-block;
+			list-style: none;
+			width: 33%;
+		}
+	}
+}
+
+footer {
+	height: 100vh;
+	width: 100vw;
+	scroll-snap-align: start;
+	-ms-scroll-snap-align: start;
+	overflow-y: scroll;
+	background-color: $background-color_1;
+	.container {
+		margin-top: 20vh;
+	}
+}

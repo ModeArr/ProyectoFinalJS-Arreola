@@ -1,0 +1,5 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home4/mastelbs/citas.mastergym.mx
+    - /bin/cp -R * $DEPLOYPATH

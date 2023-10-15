@@ -1,0 +1,19 @@
+a {
+	text-decoration: none !important;
+	color: $color_a!important;
+	&:visited {
+		color: $color_a_visited !important;
+	}
+	&:hover {
+		color: $ccolor_a_hover !important;
+	}
+	&:active {
+		color: $color_a_active !important;
+	}
+}
+
+.menu-link{
+	color: white !important;
+	font-size: 1.8rem !important;
+	font-weight: bold !important;
+}

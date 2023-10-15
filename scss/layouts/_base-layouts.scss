@@ -1,0 +1,55 @@
+#testimonios {
+	background-color: $background-color_1;
+}
+#page {
+	padding-top: 150px;
+	background-color: $background-color_1;
+}
+
+.floatImg {
+	float: left;
+	width: 350px;
+	margin: 15px;
+}
+.floatFrame {
+	float: right;
+	margin: 15px;
+}
+.paginaQuienes {
+	margin: 1% 15%;
+	padding-bottom: 3em;
+	p {
+		text-align: left;
+	}
+}
+#inicio {
+	position: relative;
+    img {
+        height: 100%;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        width: 100%;
+        object-fit: cover;
+    }
+    h1 {
+        display: none;
+      }
+  }
+
+  #nuestroEntrenador{
+	background-color: $background-color_1;
+  }
+
+  #quienesSomos{
+	.container{
+		margin-top: 20vh;
+	}
+	p{
+		font-size: 24px;
+	}
+  }
+
+  section {
+	scrollbar-width: none;
+  }
