@@ -40,7 +40,6 @@ document.addEventListener("DOMContentLoaded", async function () {
   var calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: "dayGridMonth",
   });
-  console.log("DATA");
   const data = await getCalendario();
   const calendarToUse = [];
   for (const [key, value] of Object.entries(data)) {
@@ -49,7 +48,6 @@ document.addEventListener("DOMContentLoaded", async function () {
   agregarCitaAlDom(calendarToUse.pop());
   calendar.render();
 });
-
 class Cita {
   constructor(nombre, anio, mes, dia, hora) {
     this.nombre = nombre;
@@ -64,6 +62,7 @@ class Cita {
       this.hora
     ).toJSON(); //se agrega Date() por si se ocupa después
     this.fechaCreacion = Date();
+    this.usuario = firebase.auth().currentUser.uid;
   }
 }
 
@@ -94,29 +93,41 @@ formaCita.addEventListener(
       e.preventDefault();
       e.stopImmediatePropagation();
     } else {
-      e.preventDefault();
-      let nombre = document.getElementById("nombre").value;
-      let fechaCompleta = document.getElementById("fecha").value.split("/");
-      let anio = fechaCompleta[2];
-      let mes = fechaCompleta[1];
-      let dia = fechaCompleta[0];
-      let hora = document.getElementById("floatingSelectGrid").value;
-      const cita = new Cita(nombre, anio, mes, dia, hora);
-      const data = await getCalendario();
-      const calendarToUse = [];
-      for (const [key, value] of Object.entries(data)) {
-        calendarToUse.push(value);
-      }
-      console.log(calendarToUse);
-      if (!validateCalendar(calendarToUse, cita)) {
-        guardarCita(cita);
-        agregarCitaAlDom(cita);
-      } else {
-        alertaDuplicado();
-      }
-    }
+        if(!firebase.auth().currentUser){
+            e.preventDefault();
+            document.querySelector('#login').click()
+        }else{
+            e.preventDefault();
+            let nombre = document.getElementById("nombre").value;
+            let fechaCompleta = document.getElementById("fecha").value.split("/");
+            let anio = fechaCompleta[2];
+            let mes = fechaCompleta[1];
+            let dia = fechaCompleta[0];
+            let hora = document.getElementById("floatingSelectGrid").value;
+            const cita = new Cita(nombre, anio, mes, dia, hora);
+            const data = await getCalendario();
+            const calendarToUse = [];
+            for (const [key, value] of Object.entries(data)) {
+              calendarToUse.push(value);
+            }
+ 
+            if (!validateCalendar(calendarToUse, cita)) {
+                const citasDelUsuario = calendarToUse.find((infoCita)=>infoCita.usuario === firebase.auth().currentUser.uid);
+                console.log(citasDelUsuario,typeof citasDelUsuario === void(0))
+                if(citasDelUsuario === void(0)){
+                    guardarCita(cita);
+                    agregarCitaAlDom(cita);
+                    
+                }else{
+                    alertaYaTiene();
+                }
+            } else {
+              alertaDuplicado();
+            }
+          }
+        }
+     
 
-    e.preventDefault();
     formaCita.classList.add("was-validated");
   },
   false
@@ -129,12 +140,11 @@ async function borrarCita(idCita) {
       delete dataCitas[`${key}`];
     }
   }
+  citasAgregadas.innerHTML = ""
   postData(
     "https://getpantry.cloud/apiv1/pantry/3e9ad87f-df1b-429a-936e-4b0a41215b6e/basket/calendario",
     dataCitas
-  ).then((data) => {
-    citasAgregadas.innerHTML = ""
-  });
+  )
 }
 
 async function guardarCita(cita) {
@@ -173,11 +183,36 @@ function alertaDuplicado() {
     </div>`;
 }
 
-/* function alertaYaTiene() {
+const logoutBtn = document.querySelector('#logout-btn');
+logoutBtn.addEventListener('click', e => {
+  e.preventDefault();
+  firebase.auth().signOut();
+  console.log('User signed out!');
+})
+
+
+const loginSubmit = document.querySelector('#login-submit-btn');
+loginSubmit.addEventListener('click', e => {
+  e.preventDefault();
+  var email = document.querySelector('#email').value
+  var password = document.querySelector('#password').value
+  firebase.auth().signInWithEmailAndPassword(email, password).then(function() {
+    document.querySelector('#btn-close-modal').click()
+  }).catch(function(error) {
+    // Handle Errors here.
+    var errorCode = error.code;
+    var errorMessage = error.message;
+    alert(errorCode+' '+errorMessage);
+});
+})
+
+
+
+function alertaYaTiene() {
   alerta.innerHTML = `<div class="alert alert-danger text-center alert-dismissible" role="alert" >
     Ya tienes una cita, puede borrarla y agregar otra si gustas.
 </div>`;
-} */
+}
 
 //document.getElementById("cancelarCita").addEventListener("click", borrarCita(calendario), false);
 
