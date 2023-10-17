@@ -40,12 +40,12 @@ document.addEventListener("DOMContentLoaded", async function () {
   var calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: "dayGridMonth",
   });
-  const data = await getCalendario();
+/*   const data = await getCalendario();
   const calendarToUse = [];
   for (const [key, value] of Object.entries(data)) {
     calendarToUse.push({ id: key, ...value });
-  }
-  agregarCitaAlDom(calendarToUse.pop());
+  } */
+  //agregarCitaAlDom(calendarToUse.pop());
   calendar.render();
 });
 class Cita {
@@ -66,14 +66,13 @@ class Cita {
   }
 }
 
+const formaCita = document.getElementById("formaCita");
 const citasAgregadas = document.getElementById("citaAgregada");
 const alerta = document.getElementById("alerta");
-// const cita = JSON.parse(localStorage.getItem("cita"));
-// if (cita) {
-//     agregarCitaAlDom(cita);
-//     calendario.push(cita);
-// }
-
+const modalRegistrada = bootstrap.Modal.getOrCreateInstance(document.getElementById('citaRegistrada'));
+const modalRegis = document.getElementById("citaRegistrada");
+const modalRegistradContenido = document.getElementById("contenidoCitaRegistrada");
+modalRegis.addEventListener('hidden.bs.modal', function() { formaCita.reset(); });
 function validateCalendar(citasAlmacenadas, cita) {
   const duplicado = citasAlmacenadas.filter(
     (obj) =>
@@ -85,7 +84,6 @@ function validateCalendar(citasAlmacenadas, cita) {
   return duplicado.length > 0;
 }
 
-let formaCita = document.getElementById("formaCita");
 formaCita.addEventListener(
   "submit",
   async (e) => {
@@ -110,14 +108,12 @@ formaCita.addEventListener(
             for (const [key, value] of Object.entries(data)) {
               calendarToUse.push(value);
             }
- 
             if (!validateCalendar(calendarToUse, cita)) {
                 const citasDelUsuario = calendarToUse.find((infoCita)=>infoCita.usuario === firebase.auth().currentUser.uid);
-                console.log(citasDelUsuario,typeof citasDelUsuario === void(0))
                 if(citasDelUsuario === void(0)){
                     guardarCita(cita);
                     agregarCitaAlDom(cita);
-                    
+                    modalCitaRegistrada(cita);
                 }else{
                     alertaYaTiene();
                 }
@@ -177,12 +173,6 @@ function agregarCitaAlDom(cita) {
   </div>`;
 }
 
-function alertaDuplicado() {
-  alerta.innerHTML = `<div class="alert alert-danger text-center alert-dismissible" role="alert">
-        Esta cita ya esta registrada.
-    </div>`;
-}
-
 const logoutBtn = document.querySelector('#logout-btn');
 logoutBtn.addEventListener('click', e => {
   e.preventDefault();
@@ -206,11 +196,34 @@ loginSubmit.addEventListener('click', e => {
 });
 })
 
-
+function alertaDuplicado() {
+  alerta.innerHTML = `<div class="alert alert-danger text-center alert-dismissible" role="alert">
+        Esta cita ya esta registrada.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>`;
+}
 
 function alertaYaTiene() {
   alerta.innerHTML = `<div class="alert alert-danger text-center alert-dismissible" role="alert" >
     Ya tienes una cita, puede borrarla y agregar otra si gustas.
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>`;
+}
+
+function modalCitaRegistrada(cita) {
+  modalRegistrada.show();
+  modalRegistradContenido.innerHTML = `<div class="card text-center" id="card">
+  <div class="card-header">
+    Cita
+  </div>
+  <div class="card-body">
+    <h5 class="card-title">Agregaste una cita ${cita.nombre}</h5>
+    <p class="card-text">Tu cita es para el ${cita.dia}/${cita.mes}/${cita.anio} a las ${cita.hora}:00 horas</p>
+    <a class="btn btn-primary" id="cancelarCita" onclick="borrarCita(${cita.id})">Cancelar cita</a>
+  </div>
+  <div class="card-footer text-body-secondary">
+    Recuerda llegar 5 minutos antes a tu cita.
+  </div>
 </div>`;
 }
 
